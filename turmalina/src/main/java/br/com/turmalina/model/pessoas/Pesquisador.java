@@ -1,6 +1,6 @@
-package br.com.turmalina.models.pessoas;
+package br.com.turmalina.model.pessoas;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,26 +15,26 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity 
-@Table (name = "guia_espeleologia")
+@Table (name = "pesquisador")
+@Getter 
 @Setter 
-@Getter
-@AllArgsConstructor 
 @NoArgsConstructor 
+@AllArgsConstructor 
 @SuperBuilder 
-public class GuiaEspeleologia extends Pessoa {
+public class Pesquisador extends Pessoa {
     @Id 
     @GeneratedValue (strategy = GenerationType.AUTO)
     public Long id;
 
-    @Column (name = "numero_credenciamento")
-    public String numeroCredenciamento;
+    @Column (name = "registro_institucional")
+    public String registroInstitucional;
 
-    @Column (name = "nivel_certificacao")
-    public String nivelCertificacao;
+    @Column (name = "area_pesquisa")
+    public String areaPesquisa;
 
-    @Column (name = "validade_certificacao")
-    public LocalDate validadeCertificacao;
+    @Column 
+    public String titulacao;
 
-    @Column (name = "expedicoes_concluidas")
-    public int expedicoesConcluidas;
+    @Column (name = "valor_diario_bolsa")
+    public BigDecimal valorDiarioBolsa;
 }

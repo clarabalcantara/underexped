@@ -1,9 +1,9 @@
-package br.com.turmalina.models.equipamento;
+package br.com.turmalina.model.equipamento;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
-import br.com.turmalina.models.pessoas.Pessoa;
+import br.com.turmalina.model.pessoas.Pessoa;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

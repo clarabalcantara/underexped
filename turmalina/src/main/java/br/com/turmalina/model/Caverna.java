@@ -1,4 +1,4 @@
-package br.com.turmalina.models;
+package br.com.turmalina.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

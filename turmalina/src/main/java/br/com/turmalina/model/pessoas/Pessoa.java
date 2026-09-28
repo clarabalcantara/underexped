@@ -1,4 +1,4 @@
-package br.com.turmalina.models.pessoas;
+package br.com.turmalina.model.pessoas;
 
 import java.time.LocalDate;
 

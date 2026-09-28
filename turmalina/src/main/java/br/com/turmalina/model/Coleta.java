@@ -1,6 +1,7 @@
 package br.com.turmalina.model;
 
 import br.com.turmalina.model.enums.SituacaoValidacao;
+import br.com.turmalina.model.pessoas.Pesquisador;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

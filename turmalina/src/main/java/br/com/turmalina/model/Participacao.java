@@ -1,6 +1,7 @@
 package br.com.turmalina.model;
 
 import br.com.turmalina.model.enums.PapelParticipante;
+import br.com.turmalina.model.pessoas.Pessoa;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

@@ -193,5 +193,4 @@ public class Expedicao {
     public List<Participacao> getParticipacoes() { return participacoes; }
 
     public List<Coleta> getColetas() { return coletas; }
-} class Expedicao {
 }
