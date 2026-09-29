@@ -44,12 +44,21 @@ public class MovimentacaoEquipamento {
     @Column (name = "devolucao_efetiva")
     public Instant devolucaoEfetiva;
 
+<<<<<<< HEAD:turmalina/src/main/java/br/com/turmalina/model/MovimentacaoEquipamento.java
     @Enumerated (EnumType.STRING)
     @Column (name = "estado_saida", nullable = false, length = 20)
     public EstadoEquipamento estadoSaida;
 
     @Enumerated (EnumType.STRING)
     @Column (name = "estado_retorno", length = 20)
+=======
+    @Column (name = "estado_saida")
+    @Enumerated (EnumType.STRING)
+    public EstadoEquipamento estadoSaida;
+
+    @Column (name = "estado_retorno")
+    @Enumerated (EnumType.ORDINAL)
+>>>>>>> 498e992 (feat: add mapeamento de enums):turmalina/src/main/java/br/com/turmalina/model/equipamento/MovimentacaoEquipamento.java
     public EstadoEquipamento estadoRetorno;
 
     @Column (name = "custo_avaria", precision = 12, scale = 2)
