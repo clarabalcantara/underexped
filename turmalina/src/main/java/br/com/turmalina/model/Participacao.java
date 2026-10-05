@@ -3,6 +3,8 @@ package br.com.turmalina.model;
 import br.com.turmalina.model.enums.PapelParticipante;
 import br.com.turmalina.model.pessoas.Pessoa;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,6 +19,8 @@ import java.time.LocalDate;
         uniqueConstraints = @UniqueConstraint(
                 name = "uk_participacao_expedicao_pessoa",
                 columnNames = {"expedicao_id", "pessoa_id"}))
+@AllArgsConstructor 
+@Builder 
 public class Participacao {
 
     @Id

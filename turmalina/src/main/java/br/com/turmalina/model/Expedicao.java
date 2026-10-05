@@ -2,6 +2,8 @@ package br.com.turmalina.model;
 
 import br.com.turmalina.model.enums.SituacaoExpedicao;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,6 +15,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "expedicao")
+@AllArgsConstructor 
+@Builder 
 public class Expedicao {
 
     @Id
@@ -46,6 +50,7 @@ public class Expedicao {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
+    @Builder.Default
     private SituacaoExpedicao situacao = SituacaoExpedicao.PLANEJADA;
 
     @Column(name = "cancelamento_emergencial", nullable = false)
@@ -60,6 +65,7 @@ public class Expedicao {
     @JoinTable(name = "expedicao_setor",
             joinColumns = @JoinColumn(name = "expedicao_id"),
             inverseJoinColumns = @JoinColumn(name = "setor_id"))
+    @Builder.Default
     private Set<Setor> setores = new HashSet<>();
 
 
@@ -69,9 +75,11 @@ public class Expedicao {
     private PlanoSeguranca planoSeguranca;
 
     @OneToMany(mappedBy = "expedicao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Participacao> participacoes = new ArrayList<>();
 
     @OneToMany(mappedBy = "expedicao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Coleta> coletas = new ArrayList<>();
 
     // AutorizacaoAmbiental e RelatorioFinal NÃO são mapeados aqui de propósito:
