@@ -5,7 +5,7 @@ import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.util.List;
 
-import br.com.turmalina.model.equipamento.Equipamento;
+import br.com.turmalina.model.Equipamento;
 
 
 public class EquipamentoConsultas {
