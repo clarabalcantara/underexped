@@ -24,45 +24,49 @@ import lombok.Setter;
 
 @Entity
 @Table (name = "caverna")
-@Getter 
-@Setter 
-@AllArgsConstructor 
-@NoArgsConstructor 
-@Builder 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Caverna {
     @Id
-    @GeneratedValue (strategy = GenerationType.AUTO)
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     public Long id;
 
-    @Column (name = "nome_oficial", length = 50)
+    @Column (name = "nome_oficial", nullable = false, length = 150)
     public String nomeOficial;
 
-    @Column (name = "codigo_ambiental")
+    @Column (name = "codigo_ambiental", nullable = false, length = 30, unique = true)
     public String codigoAmbiental;
 
-    @Column    
+    @Column (nullable = false, length = 100)
     public String municipio;
 
-    @Column 
+    @Column (nullable = false, length = 2)
     public String uf;
 
-    @Column 
+    @Column (precision = 7, scale = 2)
     public BigDecimal altitude;
 
-    @Column (name = "extensao_conhecida")
+    @Column (name = "extensao_conhecida", precision = 10, scale = 2)
     public BigDecimal extensaoConhecida;
 
     @Column (name = "data_ultima_inspecao")
     public LocalDate dataUltimaInspecao;
 
-    @Embedded 
-    public Coordenada Coordenada;
+    @Column (name = "acesso_permitido", nullable = false)
+    public boolean acessoPermitido;
 
-    @OneToMany (mappedBy = "caverna", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Embedded
+    public Coordenada coordenada;
+
+    @OneToMany (mappedBy = "caverna", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     public List<Setor> setores = new ArrayList<>();
 
     public void addSetor(Setor setor) {
         this.setores.add(setor);
+        setor.setCaverna(this);
     }
 }
