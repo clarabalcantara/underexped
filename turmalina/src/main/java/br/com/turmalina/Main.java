@@ -8,8 +8,11 @@ import br.com.turmalina.model.enums.*;
 import br.com.turmalina.model.pessoas.GuiaEspeleologia;
 import br.com.turmalina.model.pessoas.Pesquisador;
 import br.com.turmalina.queries.ExpedicaoConsultas;
+import br.com.turmalina.queries.EquipamentoConsultas;
+import br.com.turmalina.queries.ArquivoConsultas;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.Persistence;
 import org.hibernate.SessionFactory;
 import org.hibernate.stat.Statistics;
@@ -33,13 +36,18 @@ public class Main {
     public static void main(String[] args) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory(UNIDADE);
         Statistics stats = emf.unwrap(SessionFactory.class).getStatistics();
-
-        Long expedicaoId = popularBanco(emf);
-
         EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        ExpedicaoConsultas consultas = new ExpedicaoConsultas(em);
 
+        ExpedicaoConsultas consultas = new ExpedicaoConsultas(em);
+        EquipamentoConsultas equipamentoConsultas = new EquipamentoConsultas(em);
+        ArquivoConsultas arquivoConsultas = new ArquivoConsultas(em);
+
+        // Long expedicaoId = popularBanco(emf);
+
+        List<Expedicao> expedicoes = consultas.getAllExpedicoes();
+        Expedicao expedicao = expedicoes.get(2);
+        Long expedicaoId = expedicao.getId();
+        
         // consulta 1
         titulo("CONSULTA 1: expedições planejadas em 2026", stats);
         List<ExpedicaoResumo> lista = consultas.listarPorPeriodoESituacao(
@@ -47,7 +55,7 @@ public class Main {
                 LocalDateTime.of(2027, 1, 1, 0, 0),
                 SituacaoExpedicao.PLANEJADA);
         lista.forEach(r -> System.out.println("  " + r));
-        comandos(stats);
+        // comandos(stats);
 
         // consulta 2
         titulo("CONSULTA 2: detalhes da expedição com participantes", stats);
@@ -56,36 +64,77 @@ public class Main {
         e.getParticipacoes().forEach(p ->
                 System.out.println("  - " + p.getPessoa().getNome() + " (" + p.getPapel() + ")"));
         e.getSetores().forEach(s -> System.out.println("  setor: " + s.getDenominacao()));
-        comandos(stats);
+        // comandos(stats);
 
         // consulta 2, só nome e papel dos participantes
-        em.clear();
+        // em.clear();
         titulo("CONSULTA 2 (alternativa): participantes por projeção", stats);
         List<ParticipanteResumo> participantes = consultas.listarParticipantes(expedicaoId);
         participantes.forEach(p -> System.out.println("  " + p));
-        comandos(stats);
+        // comandos(stats);
 
         // consulta 3
-        em.clear();
+        // em.clear();
         titulo("CONSULTA 3: coletas com setor e pesquisador", stats);
         List<Coleta> coletas = consultas.listarColetas(expedicaoId);
         for (Coleta c : coletas) {
             System.out.println("  " + c.getMetodo() + " | setor: " + c.getSetor().getDenominacao()
                     + " | responsável: " + c.getResponsavel().getNome());
         }
-        comandos(stats);
+        // comandos(stats);
 
         // consulta 4
+        // em.clear();
         titulo("CONSULTA 4: amostras da primeira coleta", stats);
-        List<AmostraResumo> amostras = consultas.listarAmostras(coletas.get(0).getId());
+        List<AmostraResumo> amostras = consultas.listarAmostras(expedicaoId);
+
+        System.out.println(expedicao.getTitulo() + "Não possui amostras.");
         amostras.forEach(a -> System.out.println("  " + a));
-        comandos(stats);
+        // comandos(stats);
 
         // consultas 5 e 6 entram aqui
 
-        em.getTransaction().commit();
-        em.close();
-        emf.close();
+        // consulta 5
+        // em.clear();
+        titulo("CONSULTA 5: Listagem de equipamentos por faixa de data", stats);
+        List<Equipamento> equipamentos = equipamentoConsultas.getEquipamentosDisponiveisEntreFaixas(Instant.parse("2026-10-05T22:15:30-03:00"), Instant.parse("2026-10-19T22:15:30-03:00"));
+        // 2026-10-05T22:15:30-03:00
+        for (Equipamento tool : equipamentos) {
+            System.out.println(tool.getNome());
+        }
+        // comandos(stats);
+
+        // consulta 6
+        // 6.1 Mapa segurança
+        titulo("CONSULTA 6.1: Mapa de segurança", stats);
+        byte[] mapaSeg = arquivoConsultas.getMapaSegurancaByExpedicao(expedicao);
+        System.out.println(mapaSeg);
+
+        // 6.2 Autorização ambiental
+        titulo("CONSULTA 6.2: Autorizaçao Ambiental", stats);
+        AutorizacaoAmbiental autorizacaoAmbiental;
+        try {
+                autorizacaoAmbiental = arquivoConsultas.getAutorizacaoAmbientalByExpedicao(expedicao);
+                System.out.println(autorizacaoAmbiental);
+
+        } catch (NoResultException e1) {
+                System.out.println("Expedição não possui Autorizaçao Ambiental");
+        }
+
+        // 6.3 Relatorio Final
+        titulo("CONSULTA 6.3: Relatório Final", stats);
+        RelatorioFinal relatorioFinal;
+        try {
+                relatorioFinal = arquivoConsultas.getRelatorioFinalByExpedicao(expedicao);
+                System.out.println(relatorioFinal);
+
+        } catch (NoResultException e2) {
+                System.out.println("Expedição não possui relatório");
+        }
+
+        if (emf.isOpen()) {
+            emf.close();
+        }
     }
 
     /**
@@ -112,6 +161,7 @@ public class Main {
                 .riscoInundacao(true)
                 .caverna(caverna).build();
 
+
         // pessoas: dois pesquisadores e uma guia
         Pesquisador maria = Pesquisador.builder()
                 .nome("Maria Silva").cpf("11111111111").ativo(true)
@@ -136,16 +186,30 @@ public class Main {
         em.persist(joao);
         em.persist(ana);
 
+
         // expedição principal
         PlanoSeguranca plano = new PlanoSeguranca(
                 "Sair pela entrada principal.", "Entrada", 60, "83999999999", true);
         plano.setMapaRota(new byte[]{1, 2, 3});
 
-        Expedicao expedicao = new Expedicao("EXP-001", "Expedição Teste", "Mapear o setor B.",
-                LocalDateTime.of(2026, 11, 3, 8, 0), LocalDateTime.of(2026, 11, 5, 17, 0),
-                new BigDecimal("10000.00"), 5, caverna, plano);
+        
+
+        Expedicao expedicao = Expedicao.builder()
+            .codigo("EXP-001")
+            .titulo("Expedição Teste")
+            .objetivo("Mapear o setor B.")
+            .inicioPrevisto(LocalDateTime.of(2026, 11, 3, 8, 0))
+            .terminoPrevisto(LocalDateTime.of(2026, 11, 5, 17, 0))
+            .orcamentoAprovado(new BigDecimal("10000.00"))
+            .maxParticipantes(5)
+            .caverna(caverna)
+            .planoSeguranca(plano)
+            .build(); // O Lombok vai inicializar o Set de setores aqui automaticamente
+
         expedicao.adicionarSetor(setorA);
         expedicao.adicionarSetor(setorB);
+
+        
 
         expedicao.adicionarParticipacao(
                 new Participacao(maria, PapelParticipante.COORDENADOR, new BigDecimal("200.00"), 3));
@@ -153,6 +217,8 @@ public class Main {
                 new Participacao(joao, PapelParticipante.PESQUISADOR, new BigDecimal("150.00"), 3));
         expedicao.adicionarParticipacao(
                 new Participacao(ana, PapelParticipante.GUIA, new BigDecimal("180.00"), 3));
+
+                
 
         Coleta coleta1 = new Coleta(setorB, maria, Instant.parse("2026-11-04T10:00:00Z"),
                 "Coleta manual", "Ponto 1");
@@ -173,6 +239,8 @@ public class Main {
         expedicao.adicionarColeta(coleta1);
         expedicao.adicionarColeta(coleta2);
 
+        
+
         // salva a expedição junto com plano, participações, coletas e amostras (cascade)
         em.persist(expedicao);
 
@@ -182,24 +250,39 @@ public class Main {
         autorizacao.setPdfAssinado(new byte[]{4, 5, 6});
         em.persist(autorizacao);
 
+        
+
         RelatorioFinal relatorio = new RelatorioFinal(expedicao, "Relatório da Expedição Teste",
                 "Resumo da expedição.", LocalDate.of(2026, 11, 20), 10);
         relatorio.setArquivo(new byte[]{7, 8, 9});
         em.persist(relatorio);
 
+        
+
         // expedição antiga, já concluída
         PlanoSeguranca plano2 = new PlanoSeguranca(
                 "Sair pela entrada principal.", "Entrada", 30, "83999999999", false);
-        Expedicao antiga = new Expedicao("EXP-002", "Expedição Antiga", "Vistoria.",
-                LocalDateTime.of(2026, 9, 10, 8, 0), LocalDateTime.of(2026, 9, 10, 16, 0),
-                new BigDecimal("2000.00"), 3, caverna, plano2);
+
+        Expedicao antiga = Expedicao.builder()
+            .codigo("EXP-002")
+            .titulo("Expedição Antiga")
+            .objetivo("Vistoria")
+            .inicioPrevisto(LocalDateTime.of(2026, 9, 10, 8, 0))
+            .terminoPrevisto(LocalDateTime.of(2026, 9, 10, 16, 0))
+            .orcamentoAprovado(new BigDecimal("2000.00"))
+            .maxParticipantes(5)
+            .caverna(caverna)
+            .planoSeguranca(plano2)
+            .build();
+
         antiga.adicionarSetor(setorA);
         antiga.setSituacao(SituacaoExpedicao.CONCLUIDA);
         em.persist(antiga);
 
+        
+
         em.getTransaction().commit();
         Long id = expedicao.getId();
-        em.close();
         return id;
     }
 

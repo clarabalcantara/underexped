@@ -7,8 +7,10 @@ import br.com.turmalina.model.Coleta;
 import br.com.turmalina.model.Expedicao;
 import br.com.turmalina.model.enums.SituacaoExpedicao;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -20,6 +22,17 @@ public class ExpedicaoConsultas {
         this.em = em;
     }
 
+    public List<Expedicao> getAllExpedicoes() {
+        try {
+            return this.em.createQuery("""
+                    SELECT e FROM Expedicao e
+                    """, Expedicao.class)
+                    .getResultList();
+
+        } catch (NoResultException e) {
+            return Collections.emptyList();
+        }
+    }
 
     public List<ExpedicaoResumo> listarPorPeriodoESituacao(LocalDateTime inicio, LocalDateTime fim,
                                                            SituacaoExpedicao situacao) {
@@ -70,9 +83,16 @@ public class ExpedicaoConsultas {
 
 
     public List<Coleta> listarColetas(Long expedicaoId) {
-        return em.createNamedQuery("Coleta.listarPorExpedicao", Coleta.class)
-                .setParameter("expedicaoId", expedicaoId)
-                .getResultList();
+        // return em.createNamedQuery("Coleta.listarPorExpedicao", Coleta.class)
+        //         .setParameter("expedicaoId", expedicaoId)
+        //         .getResultList();
+
+        return em.createQuery("""
+            SELECT c FROM Coleta c
+            WHERE c.expedicao.id = :idExpedicao
+        """, Coleta.class)
+        .setParameter("idExpedicao", expedicaoId)
+        .getResultList();
     }
 
 

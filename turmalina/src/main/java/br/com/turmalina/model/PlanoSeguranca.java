@@ -1,9 +1,13 @@
 package br.com.turmalina.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 @Entity
 @Table(name = "plano_seguranca")
+@AllArgsConstructor 
+@Builder 
 public class PlanoSeguranca {
 
     @Id
