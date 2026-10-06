@@ -83,16 +83,9 @@ public class ExpedicaoConsultas {
 
 
     public List<Coleta> listarColetas(Long expedicaoId) {
-        // return em.createNamedQuery("Coleta.listarPorExpedicao", Coleta.class)
-        //         .setParameter("expedicaoId", expedicaoId)
-        //         .getResultList();
-
-        return em.createQuery("""
-            SELECT c FROM Coleta c
-            WHERE c.expedicao.id = :idExpedicao
-        """, Coleta.class)
-        .setParameter("idExpedicao", expedicaoId)
-        .getResultList();
+        return em.createNamedQuery("Coleta.listarPorExpedicao", Coleta.class)
+                .setParameter("expedicaoId", expedicaoId)
+                .getResultList();
     }
 
 
