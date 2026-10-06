@@ -7,10 +7,10 @@ import br.com.turmalina.model.RelatorioFinal;
 import jakarta.persistence.EntityManager;
 
 
-public class arquivoConsultas {
+public class ArquivoConsultas {
     private final EntityManager em;
 
-    public arquivoConsultas(EntityManager em) {
+    public ArquivoConsultas(EntityManager em) {
         this.em = em;
     }
 
