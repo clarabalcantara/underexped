@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import br.com.turmalina.utils.embeddables.Endereco;
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,37 +19,38 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-@Entity 
+@Entity
 @Table (name = "pessoa")
 @Inheritance (strategy = InheritanceType.JOINED)
+@DiscriminatorColumn (name = "tipo_pessoa")
 @Getter
-@Setter 
-@AllArgsConstructor 
-@NoArgsConstructor 
-@SuperBuilder 
-public class Pessoa {
-    @Id 
-    @GeneratedValue (strategy = GenerationType.AUTO)
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
+public abstract class Pessoa {
+    @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     public Long id;
 
-    @Column 
+    @Column (nullable = false, length = 150)
     public String nome;
 
-    @Column 
+    @Column (nullable = false, length = 11, unique = true)
     public String cpf;
 
-    @Column (name = "data_nascimento")
+    @Column (name = "data_nascimento", nullable = false)
     public LocalDate dataNascimento;
 
-    @Column 
+    @Column (nullable = false, length = 120)
     public String email;
 
-    @Column 
+    @Column (length = 20)
     public String telefone;
 
-    @Column 
-    public Boolean ativo;
+    @Column (nullable = false)
+    public boolean ativo;
 
-    @Embedded 
+    @Embedded
     public Endereco endereco;
 }

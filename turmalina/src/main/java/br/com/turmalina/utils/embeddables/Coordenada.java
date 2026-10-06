@@ -4,27 +4,25 @@ import java.math.BigDecimal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter 
-@Setter 
-@Builder 
-@Embeddable 
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Embeddable
 public class Coordenada {
-    @Column 
+    @Column (precision = 9, scale = 6)
     public BigDecimal latitude;
 
-    @Column 
+    @Column (precision = 9, scale = 6)
     public BigDecimal longitude;
 
-    @Column (name = "datum_geodesio")
-    public String datumGeodesio;
-
-    public Coordenada (BigDecimal latitude, BigDecimal longitude, String datumGeodesio) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.datumGeodesio = datumGeodesio;
-    }
+    @Column (name = "datum_geodesico", length = 20)
+    public String datumGeodesico;
 }
